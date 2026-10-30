@@ -47,13 +47,14 @@ function stopSpeech() {
 }
 
 function handleOptions() {
-    const rateSlider = document.querySelector('[name="rate"]');
-    const pitchSlider = document.querySelector('[name="pitch"]');
-    const textArea = document.querySelector('[name="text"]');
-
-    [rateSlider, pitchSlider, textArea].forEach(option => {
+    options.forEach(option => {
         option.addEventListener('input', () => {
-            if (speechSynthesis.speaking) {
+            const wasSpeaking = speechSynthesis.speaking;
+            
+            msg.rate = Number(document.querySelector('[name="rate"]').value);
+            msg.pitch = Number(document.querySelector('[name="pitch"]').value);
+
+            if (wasSpeaking) {
                 toggleSpeech();
             }
         });
