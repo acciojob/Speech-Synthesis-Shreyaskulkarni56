@@ -15,14 +15,6 @@ populateVoices();
 speechSynthesis.addEventListener('voiceschanged', populateVoices);
 
 function setVoice() {
-    const selectedVoice = voices.find(
-        voice => voice.name === voicesDropdown.value
-    );
-
-    if (selectedVoice) {
-        msg.voice = selectedVoice;
-    }
-
     if (speechSynthesis.speaking) {
         toggleSpeech();
     }
@@ -31,9 +23,10 @@ function setVoice() {
 function toggleSpeech() {
     speechSynthesis.cancel();
 
-    msg.text = document.querySelector('[name="text"]').value;
-    msg.rate = Number(document.querySelector('[name="rate"]').value);
-    msg.pitch = Number(document.querySelector('[name="pitch"]').value);
+    const text = document.querySelector('[name="text"]').value;
+    if (!text.trim()) return;
+
+    msg = new SpeechSynthesisUtterance(text);
 
     const selectedVoice = voices.find(
         voice => voice.name === voicesDropdown.value
@@ -43,9 +36,10 @@ function toggleSpeech() {
         msg.voice = selectedVoice;
     }
 
-    if (msg.text.trim()) {
-        speechSynthesis.speak(msg);
-    }
+    msg.rate = Number(document.querySelector('[name="rate"]').value);
+    msg.pitch = Number(document.querySelector('[name="pitch"]').value);
+
+    speechSynthesis.speak(msg);
 }
 
 function stopSpeech() {
@@ -53,21 +47,14 @@ function stopSpeech() {
 }
 
 function handleOptions() {
-    options.forEach(option => {
+    const rateSlider = document.querySelector('[name="rate"]');
+    const pitchSlider = document.querySelector('[name="pitch"]');
+    const textArea = document.querySelector('[name="text"]');
+
+    [rateSlider, pitchSlider, textArea].forEach(option => {
         option.addEventListener('input', () => {
-            msg.rate = Number(document.querySelector('[name="rate"]').value);
-            msg.pitch = Number(document.querySelector('[name="pitch"]').value);
-
             if (speechSynthesis.speaking) {
-                const currentText = document.querySelector('[name="text"]').value;
-
-                speechSynthesis.cancel();
-
-                msg.text = currentText;
-                msg.rate = Number(document.querySelector('[name="rate"]').value);
-                msg.pitch = Number(document.querySelector('[name="pitch"]').value);
-
-                speechSynthesis.speak(msg);
+                toggleSpeech();
             }
         });
     });
