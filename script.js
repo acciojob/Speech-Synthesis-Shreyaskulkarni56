@@ -53,30 +53,23 @@ function stopSpeech() {
 }
 
 function handleOptions() {
-    const rateSlider = document.querySelector('[name="rate"]');
-    const pitchSlider = document.querySelector('[name="pitch"]');
-    const textArea = document.querySelector('[name="text"]');
+    options.forEach(option => {
+        option.addEventListener('input', () => {
+            msg.rate = Number(document.querySelector('[name="rate"]').value);
+            msg.pitch = Number(document.querySelector('[name="pitch"]').value);
 
-    rateSlider.addEventListener('input', () => {
-        msg.rate = Number(rateSlider.value);
+            if (speechSynthesis.speaking) {
+                const currentText = document.querySelector('[name="text"]').value;
 
-        if (speechSynthesis.speaking) {
-            toggleSpeech();
-        }
-    });
+                speechSynthesis.cancel();
 
-    pitchSlider.addEventListener('input', () => {
-        msg.pitch = Number(pitchSlider.value);
+                msg.text = currentText;
+                msg.rate = Number(document.querySelector('[name="rate"]').value);
+                msg.pitch = Number(document.querySelector('[name="pitch"]').value);
 
-        if (speechSynthesis.speaking) {
-            toggleSpeech();
-        }
-    });
-
-    textArea.addEventListener('input', () => {
-        if (speechSynthesis.speaking) {
-            toggleSpeech();
-        }
+                speechSynthesis.speak(msg);
+            }
+        });
     });
 }
 
