@@ -32,8 +32,16 @@ function toggleSpeech() {
     speechSynthesis.cancel();
 
     msg.text = document.querySelector('[name="text"]').value;
-    msg.rate = document.querySelector('[name="rate"]').value;
-    msg.pitch = document.querySelector('[name="pitch"]').value;
+    msg.rate = Number(document.querySelector('[name="rate"]').value);
+    msg.pitch = Number(document.querySelector('[name="pitch"]').value);
+
+    const selectedVoice = voices.find(
+        voice => voice.name === voicesDropdown.value
+    );
+
+    if (selectedVoice) {
+        msg.voice = selectedVoice;
+    }
 
     if (msg.text.trim()) {
         speechSynthesis.speak(msg);
@@ -45,15 +53,27 @@ function stopSpeech() {
 }
 
 function handleOptions() {
-    document.querySelector('[name="rate"]').addEventListener('input', event => {
-        msg.rate = event.target.value;
+    const rateSlider = document.querySelector('[name="rate"]');
+    const pitchSlider = document.querySelector('[name="pitch"]');
+    const textArea = document.querySelector('[name="text"]');
+
+    rateSlider.addEventListener('input', () => {
+        msg.rate = Number(rateSlider.value);
+
+        if (speechSynthesis.speaking) {
+            toggleSpeech();
+        }
     });
 
-    document.querySelector('[name="pitch"]').addEventListener('input', event => {
-        msg.pitch = event.target.value;
+    pitchSlider.addEventListener('input', () => {
+        msg.pitch = Number(pitchSlider.value);
+
+        if (speechSynthesis.speaking) {
+            toggleSpeech();
+        }
     });
 
-    document.querySelector('[name="text"]').addEventListener('input', () => {
+    textArea.addEventListener('input', () => {
         if (speechSynthesis.speaking) {
             toggleSpeech();
         }
