@@ -14,29 +14,39 @@ const pitchInput = document.querySelector('[name="pitch"]');
 function populateVoices() {
     voices = speechSynthesis.getVoices();
 
-    const selectedVoiceName = voicesDropdown.value;
+    // Save the currently selected voice URI before rebuilding the dropdown
+    const selectedVoiceURI = voicesDropdown.value;
 
-    voicesDropdown.innerHTML = '<option value="">Select A Voice</option>';
+    voicesDropdown.innerHTML = '';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Select A Voice';
+    voicesDropdown.appendChild(defaultOption);
 
     voices.forEach(voice => {
         const option = document.createElement('option');
 
         option.textContent = `${voice.name} (${voice.lang})`;
-        option.value = voice.name;
+        option.value = voice.voiceURI;
 
         voicesDropdown.appendChild(option);
     });
 
-    // Preserve the previously selected voice when possible
-    if (voices.some(voice => voice.name === selectedVoiceName)) {
-        voicesDropdown.value = selectedVoiceName;
+    // Restore the previously selected voice if it still exists
+    const voiceExists = voices.some(
+        voice => voice.voiceURI === selectedVoiceURI
+    );
+
+    if (voiceExists) {
+        voicesDropdown.value = selectedVoiceURI;
     }
 }
 
 // Select a voice and restart speech if currently speaking
 function setVoice() {
     const selectedVoice = voices.find(
-        voice => voice.name === voicesDropdown.value
+        voice => voice.voiceURI === voicesDropdown.value
     );
 
     if (selectedVoice) {
@@ -62,9 +72,9 @@ function toggleSpeech() {
     const utterance = new SpeechSynthesisUtterance(text);
 
     // Apply the selected voice
-    const selectedVoice = voices.find(
-        voice => voice.name === voicesDropdown.value
-    );
+const selectedVoice = voices.find(
+    voice => voice.voiceURI === voicesDropdown.value
+);
 
     if (selectedVoice) {
         utterance.voice = selectedVoice;
